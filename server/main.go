@@ -27,18 +27,35 @@ func main() {
 	// 3. Setup Game Manager
 	manager := game.NewManager(dict, um)
 
-	// 4. Setup Routes
+	// 4. Setup Routes (API routes BEFORE static files!)
 	http.HandleFunc("/ws", manager.HandleWS)
-	http.HandleFunc("/api/register", handleRegister(um))
-	http.HandleFunc("/api/login", handleLogin(um))
+	http.HandleFunc("/api/", apiRouter(um, manager))
 	
-	// Serve Frontend (Vue build)
+	// Serve Frontend (Vue build) - catch-all last
 	fs := http.FileServer(http.Dir("../client/dist"))
 	http.Handle("/", fs)
 
 	log.Println("Server starting on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func apiRouter(um *game.UserManager, m *game.Manager) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		if r.Method == "OPTIONS" { 
+			return 
+		}
+		
+		path := r.URL.Path
+		if path == "/api/register" {
+			handleRegister(um)(w, r)
+		} else if path == "/api/login" {
+			handleLogin(um)(w, r)
+		} else {
+			http.Error(w, "Not Found", http.StatusNotFound)
+		}
 	}
 }
 
