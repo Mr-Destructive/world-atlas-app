@@ -80,12 +80,12 @@ const getPlayerStats = (player: Player) => {
 </script>
 
 <template>
-    <div class="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-hidden">
+    <div class="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto lg:overflow-hidden p-1 lg:p-0">
       
-      <!-- Left Column: Players & Stats -->
-      <div class="lg:col-span-1 space-y-4 flex flex-col min-h-0">
-        <div class="bg-white rounded-[2rem] shadow-xl p-6 border-b-[6px] border-gray-200 flex flex-col min-h-0 flex-1">
-           <div class="flex items-center gap-2 mb-3 px-2">
+      <!-- Left Column: Players & Stats (Order 2 on Mobile) -->
+      <div class="lg:col-span-1 space-y-4 flex flex-col min-h-0 order-2 lg:order-1 h-fit lg:h-auto">
+        <div class="bg-white rounded-[2rem] shadow-xl p-6 border-b-[6px] border-gray-200 flex flex-col min-h-0 flex-1 max-h-60 lg:max-h-none">
+           <div class="flex items-center gap-2 mb-3 px-2 sticky top-0 bg-white z-10">
                <span class="text-xl">👥</span>
                <h3 class="font-black text-gray-400 uppercase text-xs tracking-[0.2em]">Travelers</h3>
            </div>
@@ -134,8 +134,8 @@ const getPlayerStats = (player: Player) => {
         </div>
       </div>
 
-      <!-- Center & Right: Game & History -->
-      <div class="lg:col-span-2 space-y-4 flex flex-col min-h-0">
+      <!-- Center & Right: Game & History (Order 1 on Mobile) -->
+      <div class="lg:col-span-2 space-y-4 flex flex-col min-h-0 order-1 lg:order-2 h-[600px] lg:h-auto">
           
           <!-- Main Arena -->
           <div class="bg-white rounded-[2.5rem] shadow-xl p-6 border-b-[8px] border-gray-200 relative overflow-hidden transition-all shrink-0"

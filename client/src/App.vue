@@ -151,9 +151,9 @@ const quit = () => {
 </script>
 
 <template>
-  <div class="h-screen bg-duo-gray flex flex-col items-center p-4 overflow-hidden">
-    <div class="w-full max-w-6xl flex items-center justify-between mb-4 shrink-0">
-        <h1 class="text-3xl font-black text-duo-green tracking-wide drop-shadow-sm">World Atlas</h1>
+  <div class="h-screen bg-duo-gray flex flex-col items-center p-2 lg:p-4 overflow-hidden">
+    <div class="w-full max-w-6xl flex items-center justify-between mb-2 lg:mb-4 shrink-0">
+        <h1 class="text-xl lg:text-3xl font-black text-duo-green tracking-wide drop-shadow-sm">World Atlas</h1>
         <div v-if="user" class="flex items-center gap-4">
             <div class="text-right hidden sm:block">
                 <div class="font-black text-gray-700">{{ user.username }}</div>
