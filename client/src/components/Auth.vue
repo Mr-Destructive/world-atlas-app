@@ -79,9 +79,9 @@ const handleSubmit = async () => {
   const endpoint = isLogin.value ? '/api/login' : '/api/register'
   
   try {
-    // In dev, we might need full URL if not proxied
-    const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:8080'
-    const res = await fetch(`${baseUrl}${endpoint}`, {
+    // Get API URL from environment variable or default to current host for dev
+    const apiUrl = import.meta.env.VITE_API_URL || window.location.origin
+    const res = await fetch(`${apiUrl}${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: username.value, password: password.value })
