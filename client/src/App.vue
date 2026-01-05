@@ -94,8 +94,12 @@ const sortedPlayers = computed((): Player[] => {
 const connect = ({ name, roomId: rId }: { name: string, roomId: string }) => {
   const finalName = user.value ? user.value.username : name
   
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const wsUrl = `${protocol}//${window.location.host}/ws?name=${encodeURIComponent(finalName)}&room=${encodeURIComponent(rId)}`
+  // Get API URL from environment variable or default to current host
+  const apiUrl = import.meta.env.VITE_API_URL || window.location.origin
+  const protocol = apiUrl.includes('https') ? 'wss:' : 'ws:'
+  const host = apiUrl.replace(/^https?:\/\//, '')
+  
+  const wsUrl = `${protocol}//${host}/ws?name=${encodeURIComponent(finalName)}&room=${encodeURIComponent(rId)}`
   
   socket.value = new WebSocket(wsUrl)
 

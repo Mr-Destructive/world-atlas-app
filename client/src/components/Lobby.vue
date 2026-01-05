@@ -22,6 +22,33 @@
         </div>
       </div>
 
+      <!-- Game Mode Selection (Host Only) -->
+      <div v-if="isHost" class="mb-8">
+          <h3 class="font-black text-gray-400 uppercase text-xs tracking-[0.2em] mb-4 px-4">Game Mode</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button @click="selectedMode = 'CLASSIC'" 
+                      class="p-4 rounded-2xl border-2 text-left transition-all"
+                      :class="selectedMode === 'CLASSIC' ? 'bg-green-50 border-duo-green' : 'bg-gray-50 border-transparent hover:border-gray-200'">
+                  <div class="text-xs font-black uppercase tracking-wider mb-1" :class="selectedMode === 'CLASSIC' ? 'text-duo-green' : 'text-gray-500'">Classic</div>
+                  <div class="text-[10px] text-gray-400 font-bold leading-tight">Standard rules. 3 lives.</div>
+              </button>
+              
+              <button @click="selectedMode = 'POINT_RUSH'" 
+                      class="p-4 rounded-2xl border-2 text-left transition-all"
+                      :class="selectedMode === 'POINT_RUSH' ? 'bg-blue-50 border-duo-blue' : 'bg-gray-50 border-transparent hover:border-gray-200'">
+                  <div class="text-xs font-black uppercase tracking-wider mb-1" :class="selectedMode === 'POINT_RUSH' ? 'text-duo-blue' : 'text-gray-500'">Point Rush</div>
+                  <div class="text-[10px] text-gray-400 font-bold leading-tight">Speed & length boost scores!</div>
+              </button>
+
+              <button @click="selectedMode = 'SUDDEN_DEATH'" 
+                      class="p-4 rounded-2xl border-2 text-left transition-all"
+                      :class="selectedMode === 'SUDDEN_DEATH' ? 'bg-red-50 border-duo-red' : 'bg-gray-50 border-transparent hover:border-gray-200'">
+                  <div class="text-xs font-black uppercase tracking-wider mb-1" :class="selectedMode === 'SUDDEN_DEATH' ? 'text-duo-red' : 'text-gray-500'">Sudden Death</div>
+                  <div class="text-[10px] text-gray-400 font-bold leading-tight">1 Life. No mistakes allowed.</div>
+              </button>
+          </div>
+      </div>
+
       <!-- Players List -->
       <div class="mb-10">
           <div class="flex items-center justify-between mb-6 px-4">
@@ -52,7 +79,7 @@
                <button @click="emit('addBot')" class="flex-1 py-4 bg-white hover:bg-gray-50 text-duo-blue font-black rounded-[1.5rem] border-[3px] border-b-[6px] border-gray-200 hover:border-blue-200 active:border-b-[3px] active:translate-y-[3px] transition-all uppercase tracking-widest text-sm">
                    🤖 Add Bot
                </button>
-               <button @click="emit('start')" class="flex-[1.5] py-4 bg-duo-green hover:bg-green-500 text-white font-black rounded-[2rem] border-b-[8px] border-green-700 active:border-b-0 active:translate-y-2 transition-all text-xl uppercase tracking-[0.2em] shadow-lg">
+               <button @click="startGame" class="flex-[1.5] py-4 bg-duo-green hover:bg-green-500 text-white font-black rounded-[2rem] border-b-[8px] border-green-700 active:border-b-0 active:translate-y-2 transition-all text-xl uppercase tracking-[0.2em] shadow-lg">
                    Start Game!
                </button>
           </div>
@@ -66,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   roomId: string,
@@ -76,12 +103,17 @@ const props = defineProps<{
 
 const emit = defineEmits(['start', 'addBot', 'quit'])
 
+const selectedMode = ref("CLASSIC")
+
 const isHost = computed(() => {
     return props.players.length > 0 && props.players[0].id === props.myId
 })
 
+const startGame = () => {
+    emit('start', { mode: selectedMode.value })
+}
+
 const copyCode = () => {
     navigator.clipboard.writeText(props.roomId)
-    // Maybe a toast here later
 }
 </script>
