@@ -1,0 +1,49 @@
+package main
+
+import (
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	
+	"wa-1/game"
+)
+
+func main() {
+	// Get port from environment or use default
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	// Get data path from environment
+	dataPath := os.Getenv("DATA_PATH")
+	if dataPath == "" {
+		dataPath = filepath.Join(".", "data", "places.json")
+	}
+
+	// 1. Load Dictionary
+	dict, err := game.NewDictionary(dataPath)
+	if err != nil {
+		log.Fatalf("Failed to load dictionary: %v", err)
+	}
+	log.Println("Dictionary loaded.")
+
+	// 2. Setup Game Manager
+	manager := game.NewManager(dict)
+
+	// 3. Setup Routes
+	http.HandleFunc("/ws", manager.HandleWS)
+	
+	// Serve Frontend (Vue build) - only if it exists
+	frontendPath := filepath.Join(".", "dist")
+	if _, err := os.Stat(frontendPath); err == nil {
+		fs := http.FileServer(http.Dir(frontendPath))
+		http.Handle("/", fs)
+	}
+
+	log.Printf("Server starting on :%s\n", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatal(err)
+	}
+}

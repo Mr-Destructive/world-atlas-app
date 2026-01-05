@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: wa-1-backend
+    runtime: go
+    rootDir: server
+    buildCommand: go build -o server_bin
+    startCommand: ./server_bin
+    envVars:
+      - key: DATA_PATH
+        value: ./data/places.json
+      - key: PORT
+        value: 8080
