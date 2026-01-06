@@ -85,8 +85,13 @@ const handleSubmit = async () => {
   const endpoint = isLogin.value ? '/api/login' : '/api/register'
   
   try {
-    // Get API URL from environment variable or default to current host for dev
-    const apiUrl = import.meta.env.VITE_API_URL || window.location.origin
+    // Get API URL from environment variable or default to current host
+    // For production: use VITE_API_URL from .env.production
+    // For development: use VITE_API_URL from .env.development or localhost
+    let apiUrl = import.meta.env.VITE_API_URL
+    if (!apiUrl) {
+      apiUrl = window.location.origin
+    }
     const fullUrl = `${apiUrl}${endpoint}`
     
     const payload = { username: username.value.trim(), password: password.value }
