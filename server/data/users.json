@@ -1,1 +1,22 @@
-{}
+{
+  "temp2": {
+    "id": "6441f9e3-8c50-4c69-aeed-e5ae4a0484b3",
+    "username": "temp2",
+    "passwordHash": "105273c009f2599d1745fd406c15b8c203e767a93dff610f04259654d9ad4775",
+    "salt": "9fd11234-c2b4-4b76-8aad-b37be0857071",
+    "createdAt": "2026-01-06T22:06:40.616891087+05:30",
+    "gamesPlayed": 0,
+    "totalScore": 0,
+    "wins": 0
+  },
+  "testuser": {
+    "id": "67b2b5d7-b745-46bf-8824-44dceabc61d5",
+    "username": "testuser",
+    "passwordHash": "b4958764f431fe619d7592705ab2cf02d981a8d18ce021c38abf5daa86dfe5c4",
+    "salt": "a7c1486a-f9f3-4b11-a8b0-8c79bf609931",
+    "createdAt": "2026-01-06T22:06:17.810982705+05:30",
+    "gamesPlayed": 0,
+    "totalScore": 0,
+    "wins": 0
+  }
+}

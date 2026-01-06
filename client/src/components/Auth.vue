@@ -76,26 +76,44 @@ const handleSubmit = async () => {
   error.value = ''
   loading.value = true
   
+  if (!username.value.trim() || !password.value.trim()) {
+    error.value = 'Username and password are required'
+    loading.value = false
+    return
+  }
+  
   const endpoint = isLogin.value ? '/api/login' : '/api/register'
   
   try {
     // Get API URL from environment variable or default to current host for dev
     const apiUrl = import.meta.env.VITE_API_URL || window.location.origin
-    const res = await fetch(`${apiUrl}${endpoint}`, {
+    const fullUrl = `${apiUrl}${endpoint}`
+    
+    const payload = { username: username.value.trim(), password: password.value }
+    console.log(`[Auth] ${isLogin.value ? 'Login' : 'Register'} attempt to ${fullUrl}`, { username: payload.username })
+    
+    const res = await fetch(fullUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value, password: password.value })
+      body: JSON.stringify(payload)
     })
 
     const data = await res.json()
+    console.log(`[Auth] Response status: ${res.status}`, data)
     
     if (!res.ok) {
-      throw new Error(data.error || 'Something went wrong')
+      const errorMsg = data?.error || data?.message || 'Something went wrong'
+      throw new Error(errorMsg)
     }
 
+    console.log('[Auth] Success, emitting login event')
     emit('login', data)
+    // Clear form on success
+    username.value = ''
+    password.value = ''
   } catch (err: any) {
-    error.value = typeof err.message === 'string' ? err.message : 'Failed to connect'
+    console.error('[Auth] Error:', err)
+    error.value = typeof err?.message === 'string' ? err.message : 'Failed to connect to server'
   } finally {
     loading.value = false
   }
