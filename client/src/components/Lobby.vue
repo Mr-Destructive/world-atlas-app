@@ -92,8 +92,11 @@
                <button @click="emit('addBot')" class="flex-1 py-4 bg-white hover:bg-gray-50 text-duo-blue font-black rounded-[1.5rem] border-[3px] border-b-[6px] border-gray-200 hover:border-blue-200 active:border-b-[3px] active:translate-y-[3px] transition-all uppercase tracking-widest text-sm">
                    🤖 Add Bot
                </button>
-               <button @click="startGame" :disabled="!allPlayersReady && players.filter(p => p.type === 0).length > 0" class="flex-[1.5] py-4 bg-duo-green hover:bg-green-500 disabled:bg-gray-300 disabled:border-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-black rounded-[2rem] border-b-[8px] border-green-700 disabled:border-gray-400 active:border-b-0 active:translate-y-2 transition-all text-xl uppercase tracking-[0.2em] shadow-lg">
-                   {{ allPlayersReady ? 'Start Game!' : 'Waiting for Players...' }}
+               <button @click="startGame" :disabled="!allPlayersReady" class="flex-[1.5] py-4 bg-duo-green hover:bg-green-500 disabled:bg-gray-300 disabled:border-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-black rounded-[2rem] border-b-[8px] border-green-700 disabled:border-gray-400 active:border-b-0 active:translate-y-2 transition-all text-xl uppercase tracking-[0.2em] shadow-lg">
+                   <div v-if="!hasAtLeastTwoPlayers" class="text-sm">Need 2 players ({{ players.length }}/2)</div>
+                   <div v-else-if="!hasAtLeastOneHuman" class="text-sm">Need at least 1 human</div>
+                   <div v-else-if="allPlayersReady">Start Game!</div>
+                   <div v-else class="text-sm">{{ readyPlayers.size }}/{{ humanPlayers.length }} ready</div>
                </button>
           </div>
           <div v-else class="flex flex-col gap-4">
@@ -208,9 +211,15 @@ const toggleReady = (playerId: string) => {
     }
 }
 
+const humanPlayers = computed(() => props.players.filter(p => p.type === 0))
+const hasAtLeastTwoPlayers = computed(() => props.players.length >= 2)
+const hasAtLeastOneHuman = computed(() => humanPlayers.value.length >= 1)
+
 const allPlayersReady = computed(() => {
-    if (props.players.length === 0) return false
-    return props.players.every(p => isPlayerReady(p.id))
+    // Need at least 2 players total with at least 1 human
+    if (!hasAtLeastTwoPlayers.value || !hasAtLeastOneHuman.value) return false
+    // All human players must be ready
+    return humanPlayers.value.every(p => isPlayerReady(p.id))
 })
 
 const startGame = () => {
@@ -243,3 +252,37 @@ watch(() => chatMessages.value?.length, () => {
     }, 50)
 })
 </script>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>

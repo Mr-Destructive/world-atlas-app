@@ -237,7 +237,20 @@ func (r *Room) addBot() {
 func (r *Room) startGame(mode string, settings map[string]int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if len(r.Players) < 1 { // Allow solo play for testing?
+	
+	// Require at least 2 players (can be bot + human)
+	if len(r.Players) < 2 {
+		return
+	}
+	
+	// Require at least 1 human player
+	humanCount := 0
+	for _, p := range r.Players {
+		if p.Type == PlayerHuman {
+			humanCount++
+		}
+	}
+	if humanCount < 1 {
 		return
 	}
 	
