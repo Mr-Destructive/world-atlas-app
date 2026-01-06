@@ -27,11 +27,13 @@ func main() {
 	// 3. Setup Game Manager
 	manager := game.NewManager(dict, um)
 
-	// 4. Setup Routes (API routes BEFORE static files!)
+	// 4. Setup Routes
+	// Handle API routes specifically to avoid conflict with file server catch-all
+	http.HandleFunc("/api/register", handleRegister(um))
+	http.HandleFunc("/api/login", handleLogin(um))
 	http.HandleFunc("/ws", manager.HandleWS)
-	http.HandleFunc("/api/", apiRouter(um, manager))
 	
-	// Serve Frontend (Vue build) - catch-all last
+	// Serve Frontend (Vue build)
 	fs := http.FileServer(http.Dir("../client/dist"))
 	http.Handle("/", fs)
 
@@ -41,27 +43,15 @@ func main() {
 	}
 }
 
-func apiRouter(um *game.UserManager, m *game.Manager) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		enableCors(&w)
-		if r.Method == "OPTIONS" { 
-			return 
-		}
-		
-		path := r.URL.Path
-		if path == "/api/register" {
-			handleRegister(um)(w, r)
-		} else if path == "/api/login" {
-			handleLogin(um)(w, r)
-		} else {
-			http.Error(w, "Not Found", http.StatusNotFound)
-		}
-	}
-}
-
 type AuthRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+func respondJSONError(w http.ResponseWriter, message string, code int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
 
 func handleRegister(um *game.UserManager) http.HandlerFunc {
@@ -70,19 +60,19 @@ func handleRegister(um *game.UserManager) http.HandlerFunc {
 		if r.Method == "OPTIONS" { return }
 		
 		if r.Method != "POST" {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			respondJSONError(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
 		var req AuthRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			respondJSONError(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
 		user, err := um.Register(req.Username, req.Password)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusConflict)
+			respondJSONError(w, err.Error(), http.StatusConflict)
 			return
 		}
 
@@ -97,19 +87,19 @@ func handleLogin(um *game.UserManager) http.HandlerFunc {
 		if r.Method == "OPTIONS" { return }
 
 		if r.Method != "POST" {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			respondJSONError(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
 		var req AuthRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			respondJSONError(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
 		user, err := um.Login(req.Username, req.Password)
 		if err != nil {
-			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+			respondJSONError(w, "Invalid username or password", http.StatusUnauthorized)
 			return
 		}
 

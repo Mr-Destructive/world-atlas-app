@@ -151,50 +151,45 @@ const quit = () => {
 </script>
 
 <template>
-  <div class="h-screen bg-duo-gray flex flex-col items-center p-2 lg:p-4 overflow-hidden">
-    <div class="w-full max-w-6xl flex items-center justify-between mb-2 lg:mb-4 shrink-0">
-        <h1 class="text-xl lg:text-3xl font-black text-duo-green tracking-wide drop-shadow-sm">World Atlas</h1>
+  <div class="h-screen flex flex-col items-center p-2 lg:p-4 overflow-hidden">
+    <div class="w-full max-w-6xl flex items-center justify-between mb-2 lg:mb-6 shrink-0 bg-white/50 backdrop-blur-md p-3 rounded-2xl border-2 border-white/50 shadow-sm z-50">
+        <div class="flex items-center gap-3">
+            <img src="/mascot.svg" alt="Mascot" class="w-8 h-8 lg:w-10 lg:h-10 drop-shadow-sm hover:rotate-12 transition-transform cursor-pointer" />
+            <h1 class="text-xl lg:text-2xl font-black text-duo-green tracking-wide drop-shadow-sm uppercase">World Atlas</h1>
+        </div>
         <div v-if="user" class="flex items-center gap-4">
             <div class="text-right hidden sm:block">
-                <div class="font-black text-gray-700">{{ user.username }}</div>
+                <div class="font-black text-gray-700 leading-tight">{{ user.username }}</div>
                 <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Score: {{ user.totalScore }} • Wins: {{ user.wins }}</div>
             </div>
-            <button @click="handleLogout" class="text-xs font-black text-red-400 hover:text-red-600 uppercase tracking-widest border-2 border-red-100 rounded-lg px-3 py-1 hover:bg-red-50 transition-colors">
-                Logout
+            <button @click="handleLogout" class="text-xs font-black text-red-400 hover:text-white hover:bg-red-400 border-2 border-red-100 hover:border-red-400 rounded-xl px-4 py-2 transition-all">
+                LOGOUT
             </button>
         </div>
     </div>
 
     <!-- Global Error -->
-    <div v-if="errorMsg" class="fixed top-4 right-4 z-50 p-4 bg-red-100 text-duo-red font-bold rounded-xl border-l-4 border-duo-red shadow-md animate-bounce">
+    <div v-if="errorMsg" class="fixed top-20 right-4 z-50 p-4 bg-red-100 text-duo-red font-bold rounded-xl border-l-4 border-duo-red shadow-md animate-bounce">
        {{ errorMsg }}
     </div>
 
     <!-- Views -->
-    <div class="w-full max-w-6xl flex-1 flex justify-center min-h-0">
-        <Auth v-if="viewState === 'AUTH'" @login="handleLogin" @guest="handleGuest" />
-
-        <Home v-else-if="viewState === 'HOME'" :user-name="user?.username" @join="connect" />
-        
-        <Lobby v-else-if="viewState === 'LOBBY'" 
-               :room-id="roomId" 
-               :players="sortedPlayers" 
-               :my-id="myId"
-               @start="startGame"
-               @add-bot="addBot"
-               @quit="quit" />
-               
-        <Game v-else-if="viewState === 'GAME' && gameState" 
-              :game-state="gameState" 
-              :my-id="myId" 
-              @submit="submitWord"
-              @quit="quit" />
-
-        <GameOver v-else-if="viewState === 'ENDED' && gameState"
-                  :game-state="gameState"
-                  :my-id="myId"
-                  @start="startGame"
-                  @quit="quit" />
+    <div class="w-full max-w-6xl flex-1 flex justify-center min-h-0 relative">
+        <Transition name="slide-fade" mode="out-in">
+            <component :is="viewState === 'AUTH' ? Auth : viewState === 'HOME' ? Home : viewState === 'LOBBY' ? Lobby : viewState === 'GAME' ? Game : GameOver"
+                       v-bind="viewState === 'HOME' ? { userName: user?.username } : 
+                               viewState === 'LOBBY' ? { roomId, players: sortedPlayers, myId } :
+                               viewState === 'GAME' ? { gameState, myId } :
+                               viewState === 'ENDED' ? { gameState, myId } : {}"
+                       @login="handleLogin" 
+                       @guest="handleGuest"
+                       @join="connect"
+                       @start="startGame"
+                       @add-bot="addBot"
+                       @quit="quit"
+                       @submit="submitWord"
+            />
+        </Transition>
     </div>
   </div>
 </template>

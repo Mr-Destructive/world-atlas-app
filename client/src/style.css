@@ -11,5 +11,19 @@
 }
 
 body {
-  @apply bg-duo-gray font-sans text-gray-800;
+  @apply bg-duo-gray font-sans text-gray-800 overflow-hidden;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Page Transitions */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
 }

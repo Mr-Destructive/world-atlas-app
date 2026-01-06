@@ -37,8 +37,8 @@ const join = () => {
   <div class="w-full max-w-md">
     <!-- Character/Mascot Placeholder Area -->
     <div class="text-center mb-8 animate-bounce-slow">
-        <div class="inline-block p-6 bg-white rounded-full shadow-xl border-b-4 border-gray-200 text-6xl">
-            🌍
+        <div class="inline-block p-6 bg-white rounded-full shadow-xl border-b-4 border-gray-200">
+            <img src="/mascot.svg" alt="World Atlas Mascot" class="w-24 h-24" />
         </div>
     </div>
 
