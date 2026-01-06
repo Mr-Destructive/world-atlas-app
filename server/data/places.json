@@ -1,5 +1,33 @@
 [
   {
+    "name": "Africa",
+    "type": "Continent"
+  },
+  {
+    "name": "Antarctica",
+    "type": "Continent"
+  },
+  {
+    "name": "Asia",
+    "type": "Continent"
+  },
+  {
+    "name": "Europe",
+    "type": "Continent"
+  },
+  {
+    "name": "North America",
+    "type": "Continent"
+  },
+  {
+    "name": "South America",
+    "type": "Continent"
+  },
+  {
+    "name": "Oceania",
+    "type": "Continent"
+  },
+  {
     "name": "Aalborg",
     "type": "City"
   },

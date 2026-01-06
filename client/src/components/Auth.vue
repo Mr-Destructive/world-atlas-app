@@ -17,14 +17,14 @@
       </button>
     </div>
 
-    <form @submit.prevent="handleSubmit" class="space-y-4">
+    <form @submit.prevent="handleSubmit" class="space-y-3">
       <div>
         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Username</label>
         <input 
           v-model="username" 
           type="text" 
           required
-          class="w-full p-4 bg-gray-50 rounded-xl font-bold border-2 border-gray-100 focus:border-duo-green focus:outline-none transition-colors"
+          class="w-full p-3 bg-gray-50 rounded-xl font-bold border-2 border-gray-100 focus:border-duo-green focus:outline-none transition-colors text-sm"
           placeholder="Explorer Name"
         />
       </div>
@@ -35,7 +35,7 @@
           v-model="password" 
           type="password" 
           required
-          class="w-full p-4 bg-gray-50 rounded-xl font-bold border-2 border-gray-100 focus:border-duo-green focus:outline-none transition-colors"
+          class="w-full p-3 bg-gray-50 rounded-xl font-bold border-2 border-gray-100 focus:border-duo-green focus:outline-none transition-colors text-sm"
           placeholder="••••••••"
         />
       </div>
@@ -47,12 +47,12 @@
       <button 
         type="submit" 
         :disabled="loading"
-        class="w-full py-4 mt-4 bg-duo-green hover:bg-green-500 text-white font-black rounded-[1.5rem] border-b-[6px] border-green-700 active:border-b-0 active:translate-y-2 transition-all uppercase tracking-widest shadow-lg disabled:opacity-50"
+        class="w-full py-3 mt-2 bg-duo-green hover:bg-green-500 text-white font-black rounded-[1.5rem] border-b-[6px] border-green-700 active:border-b-0 active:translate-y-1 transition-all uppercase tracking-widest shadow-lg disabled:opacity-50 text-sm"
       >
         {{ loading ? 'Wait...' : (isLogin ? 'Log In' : 'Sign Up') }}
       </button>
       
-      <div class="text-center mt-4">
+      <div class="text-center mt-3">
           <button type="button" @click="$emit('guest')" class="text-gray-400 text-xs font-black uppercase hover:text-gray-600 underline">
               Continue as Guest
           </button>

@@ -47,6 +47,7 @@ const gameState = ref<GameState | null>(null)
 const myId = ref<string>("")
 const roomId = ref<string>("")
 const errorMsg = ref("")
+const chatMessages = ref<any[]>([])
 
 const user = ref<User | null>(null)
 const isGuest = ref(false)
@@ -115,6 +116,8 @@ const connect = ({ name, roomId: rId }: { name: string, roomId: string }) => {
       roomId.value = data.payload.roomId
     } else if (data.type === 'GAME_STATE') {
       gameState.value = data.payload
+    } else if (data.type === 'CHAT_MESSAGE') {
+      chatMessages.value.push(data.payload)
     } else if (data.type === 'ERROR') {
         errorMsg.value = data.payload.message
         setTimeout(() => errorMsg.value = "", 3000)
@@ -125,6 +128,7 @@ const connect = ({ name, roomId: rId }: { name: string, roomId: string }) => {
     connected.value = false
     gameState.value = null
     roomId.value = ""
+    chatMessages.value = []
   }
 }
 
@@ -178,7 +182,7 @@ const quit = () => {
         <Transition name="slide-fade" mode="out-in">
             <component :is="viewState === 'AUTH' ? Auth : viewState === 'HOME' ? Home : viewState === 'LOBBY' ? Lobby : viewState === 'GAME' ? Game : GameOver"
                        v-bind="viewState === 'HOME' ? { userName: user?.username } : 
-                               viewState === 'LOBBY' ? { roomId, players: sortedPlayers, myId } :
+                               viewState === 'LOBBY' ? { roomId, players: sortedPlayers, myId, socket, chatMessages } :
                                viewState === 'GAME' ? { gameState, myId } :
                                viewState === 'ENDED' ? { gameState, myId } : {}"
                        @login="handleLogin" 

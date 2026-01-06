@@ -27,6 +27,13 @@ type Move struct {
 	Timestamp  int64  `json:"timestamp"`
 }
 
+type ChatMessage struct {
+	PlayerID   string `json:"playerId"`
+	PlayerName string `json:"playerName"`
+	Message    string `json:"message"`
+	Timestamp  int64  `json:"timestamp"`
+}
+
 type Room struct {
 	ID               string
 	Players          map[string]*Player
@@ -37,6 +44,7 @@ type Room struct {
 	LastWord         string
 	History          []Move `json:"history"`
 	Round            int    `json:"round"`
+	ChatHistory      []ChatMessage `json:"chatHistory"`
 	
 	Mode     string         `json:"mode"`     // CLASSIC, POINT_RUSH, SUDDEN_DEATH
 	Settings map[string]int `json:"settings"` // e.g., "timeLimit": 300
@@ -50,6 +58,7 @@ type Room struct {
 	Unregister chan *Player
 	Broadcast  chan []byte
 	Action     chan *ActionMessage
+	Chat       chan *ActionMessage
 
 	mu sync.RWMutex
 }
@@ -75,7 +84,9 @@ func NewRoom(id string, dict *Dictionary, um *UserManager) *Room {
 		Unregister:  make(chan *Player),
 		Broadcast:   make(chan []byte),
 		Action:      make(chan *ActionMessage),
+		Chat:        make(chan *ActionMessage),
 		History:     []Move{},
+		ChatHistory: []ChatMessage{},
 		Round:       1,
 	}
 }
@@ -140,10 +151,47 @@ func (r *Room) Run() {
 			}
 			r.mu.RUnlock()
 
+		case chatMsg := <-r.Chat:
+			r.handleChatMessage(chatMsg)
+
 		case action := <-r.Action:
 			r.handleAction(action)
 		}
 	}
+}
+
+func (r *Room) handleChatMessage(msg *ActionMessage) {
+	var p struct {
+		Message string `json:"message"`
+	}
+	if err := json.Unmarshal(msg.Payload, &p); err != nil {
+		return
+	}
+
+	r.mu.Lock()
+	player := r.Players[msg.PlayerID]
+	if player == nil {
+		r.mu.Unlock()
+		return
+	}
+
+	chatMsg := ChatMessage{
+		PlayerID:   msg.PlayerID,
+		PlayerName: player.Name,
+		Message:    p.Message,
+		Timestamp:  time.Now().Unix(),
+	}
+
+	r.ChatHistory = append(r.ChatHistory, chatMsg)
+	r.mu.Unlock()
+
+	// Broadcast chat message
+	response := map[string]interface{}{
+		"type":    "CHAT_MESSAGE",
+		"payload": chatMsg,
+	}
+	data, _ := json.Marshal(response)
+	r.Broadcast <- data
 }
 
 func (r *Room) handleAction(action *ActionMessage) {
@@ -167,6 +215,8 @@ func (r *Room) handleAction(action *ActionMessage) {
 		}
 	case "BOT_MOVE":
 		r.processBotTurn(action.PlayerID)
+	case "CHAT":
+		r.Chat <- action
 	}
 }
 
