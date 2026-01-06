@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	
 	"wa-1/game"
@@ -37,8 +39,15 @@ func main() {
 	fs := http.FileServer(http.Dir("../client/dist"))
 	http.Handle("/", fs)
 
-	log.Println("Server starting on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	// Get port from environment variable or default to 8080
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	
+	addr := fmt.Sprintf(":%s", port)
+	log.Printf("Server starting on %s", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)
 	}
 }
